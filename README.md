@@ -22,6 +22,13 @@ Uses Hypriot busybox and hypriot alpine builds.
 * Hypriot @ [blog.hypriot.com](http://blog.hypriot.com)
 * Medium/Dockerfile @ [medium](https://medium.com/@dockerfile/docker-on-raspbian-c5e094ac50dc#.lmfdkugdj)
 
+## Quickest Start (with docker-compose)
+* `export OVPN_HOSTNAME=VPN.SERVERNAME.COM`
+* `export OVPN_NATDEVICE=eth0`
+* `./init.sh`
+* `./startserver.sh`
+* `./genclient.sh CLIENTNAME`
+
 ## Quick Start
 
 * Create the `$OVPN_DATA` volume container, i.e. `OVPN_DATA="ovpn-data"`
