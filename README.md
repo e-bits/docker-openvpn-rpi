@@ -25,8 +25,7 @@ Uses Hypriot busybox and hypriot alpine builds.
 ## Quickest Start (with docker-compose)
 * `export OVPN_HOSTNAME=VPN.SERVERNAME.COM`
 * `export OVPN_NATDEVICE=eth0`
-* `./init.sh`
-* `./startserver.sh`
+* `./setup.sh`
 * `./genclient.sh CLIENTNAME`
 
 ## Quick Start
