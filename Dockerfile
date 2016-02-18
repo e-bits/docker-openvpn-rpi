@@ -1,8 +1,8 @@
-FROM hypriot/rpi-alpine-scratch
-#FROM resin/rpi-raspbian:wheezy
+# Original credit: https://github.com/jpetazzo/dockvpn
+# Original credit: https://github.com/kylemanna/docker-openvpn
 
-#RUN apt-get update -q
-#RUN apt-get install -qy openvpn iptables socat curl
+FROM hypriot/rpi-alpine-scratch
+
 RUN echo "http://dl-4.alpinelinux.org/alpine/edge/community/" >> /etc/apk/repositories && \
     apk add --update openvpn iptables bash easy-rsa && \
     ln -s /usr/share/easy-rsa/easyrsa /usr/local/bin && \
