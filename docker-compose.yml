@@ -1,35 +1,38 @@
-ovpn-data:
-  image: hypriot/armhf-busybox
-  volumes:
-  - /etc/openvpn
+version: '2'
+services:
+ ovpn-data:
+   image: busybox
+   volumes:
+    - .:/etc/openvpn
+   container_name: ovpn-data
 
-genconfig:
-  image: evolvedm/openvpn-rpi
-  volumes_from:
-  - ovpn-data
-  command: ovpn_genconfig -u udp://${OVPN_HOSTNAME}
+ genconfig:
+   image: kylemanna/openvpn
+   volumes_from:
+    - container:ovpn-data
+   command: ovpn_genconfig -u udp://${OVPN_HOSTNAME}
 
-initpki:
-  image: evolvedm/openvpn-rpi
-  volumes_from:
-  - ovpn-data
-  command: ovpn_initpki
+ initpki:
+   image: kylemanna/openvpn
+   volumes_from:
+    - container:ovpn-data
+   command: ovpn_initpki
 
-openvpn-server:
-  image: evolvedm/openvpn-rpi
-  volumes_from:
-  - ovpn-data
-  ports:
-  - "1194:1194/udp"
-  cap_add:
-  - NET_ADMIN
-  restart: always
-  net: host
-  environment:
+ openvpn-server:
+   image: kylemanna/openvpn
+   volumes_from:
+    - ovpn-data
+   ports:
+    - "1194:1194/udp"
+   cap_add:
+    - NET_ADMIN
+   restart: "always"
+   network_mode: "host"
+   environment:
     - OVPN_NATDEVICE=${OVPN_NATDEVICE}
-  container_name: openvpn-server
+   container_name: openvpn-server
 
-genclient:
-  image: evolvedm/openvpn-rpi
-  volumes_from:
-  - ovpn-data
+ genclient:
+   image: kylemanna/openvpn
+   volumes_from:
+    - container:ovpn-data
