@@ -1,25 +1,25 @@
 version: '2'
 services:
  ovpn-data:
-   image: busybox
+   image: hypriot/armhf-busybox
    volumes:
     - .:/etc/openvpn
    container_name: ovpn-data
 
  genconfig:
-   image: kylemanna/openvpn
+   image: evolvedm/openvpn-rpi
    volumes_from:
     - container:ovpn-data
    command: ovpn_genconfig -u udp://${OVPN_HOSTNAME}
 
  initpki:
-   image: kylemanna/openvpn
+   image: evolvedm/openvpn-rpi
    volumes_from:
     - container:ovpn-data
    command: ovpn_initpki
 
  openvpn-server:
-   image: kylemanna/openvpn
+   image: evolvedm/openvpn-rpi
    volumes_from:
     - ovpn-data
    ports:
@@ -33,6 +33,6 @@ services:
    container_name: openvpn-server
 
  genclient:
-   image: kylemanna/openvpn
+   image: evolvedm/openvpn-rpi
    volumes_from:
     - container:ovpn-data
