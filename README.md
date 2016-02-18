@@ -2,6 +2,8 @@
 
 OpenVPN server in a Docker container on the Raspberry Pi, complete with an EasyRSA PKI CA.
 
+Uses Hypriot busybox and hypriot alpine builds.
+
 #### Install Docker on Raspberry Pi 2
 * Install raspbian jessie lite - [download](https://downloads.raspberrypi.org/raspbian_lite_latest)
 * Download and install hypriot docker build - [download](http://downloads.hypriot.com/docker-hypriot_1.10.1-1_armhf.deb)
