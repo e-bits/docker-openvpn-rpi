@@ -6,8 +6,10 @@ OpenVPN server in a Docker container on the Raspberry Pi, complete with an EasyR
 * Install raspbian jessie lite - [download](https://downloads.raspberrypi.org/raspbian_lite_latest)
 * Download and install hypriot docker build - [download](http://downloads.hypriot.com/docker-hypriot_1.10.1-1_armhf.deb)
     * `sudo dpkg -i docker-hypriot_1.10.1-1_armhf.deb`
-    * `systemctl start docker`
-    * `systemctl enable docker`
+    * `sudo systemctl start docker`
+    * `sudo systemctl enable docker`
+    * `sudo usermod -aG docker pi`
+    * `newgrp docker`
     * `docker -v`
 
 #### Links
@@ -22,41 +24,34 @@ OpenVPN server in a Docker container on the Raspberry Pi, complete with an EasyR
 
 * Create the `$OVPN_DATA` volume container, i.e. `OVPN_DATA="ovpn-data"`
 
-        docker run --name `$OVPN_DATA` -v /etc/openvpn hypriot/armhf-busybox
+        docker run --name **$OVPN_DATA** -v /etc/openvpn hypriot/armhf-busybox
 
 * Initialize the `$OVPN_DATA` container that will hold the configuration files and certificates
 
-        docker run --volumes-from `$OVPN_DATA` --rm evolvedm/openvpn-rpi ovpn_genconfig -u udp://`VPN.SERVERNAME.COM`
-        docker run --volumes-from `$OVPN_DATA` --rm -it evolvedm/openvpn-rpi ovpn_initpki
+        docker run --volumes-from **$OVPN_DATA** --rm evolvedm/openvpn-rpi ovpn_genconfig -u udp://**VPN.SERVERNAME.COM**
+        docker run --volumes-from **$OVPN_DATA** --rm -it evolvedm/openvpn-rpi ovpn_initpki
 
 * Start OpenVPN server process
+    - With net=host and `$OVPN_NATDEVICE` (if you want to ipforward over a specific interface)
 
-    - On Docker [version 1.2](http://blog.docker.com/2014/08/announcing-docker-1-2-0/) and newer
+            docker run -d --volumes-from **$OVPN_DATA** --cap-add=NET_ADMIN -p 1194:1194/udp --net=host -e OVPN_NATDEVICE=**$OVPN_NATDEVICE** --restart=always --name openvpn_server evolvedm/openvpn-rpi
 
-            docker run --volumes-from `$OVPN_DATA` -d -p 1194:1194/udp --cap-add=NET_ADMIN -e OVPN_NATDEVICE=`$OVPN_NATDEVICE` --restart=always --name openvpn_server evolvedm/openvpn-rpi
+    - Default, simpler setup
+    
+            docker run --volumes-from **$OVPN_DATA** -d -p 1194:1194/udp --cap-add=NET_ADMIN -e --restart=always --name openvpn_server evolvedm/openvpn-rpi
 
 * Generate a client certificate without a passphrase
 
-        docker run --volumes-from `$OVPN_DATA` --rm -it evolvedm/openvpn-rpi easyrsa build-client-full `CLIENTNAME` nopass
+        docker run --volumes-from **$OVPN_DATA** --rm -it evolvedm/openvpn-rpi easyrsa build-client-full **CLIENTNAME** nopass
 
 * Retrieve the client configuration with embedded certificates
 
-        docker run --volumes-from `$OVPN_DATA` --rm evolvedm/openvpn-rpi ovpn_getclient `CLIENTNAME` > `CLIENTNAME`.ovpn
+        docker run --volumes-from **$OVPN_DATA** --rm evolvedm/openvpn-rpi ovpn_getclient **CLIENTNAME** > **CLIENTNAME**.ovpn
 
 * Create an environment variable with the name DEBUG and value of 1 to enable debug output (using "docker -e").
 
-        docker run --volumes-from `$OVPN_DATA` -d -p 1194:1194/udp --privileged -e DEBUG=1 evolvedm/openvpn-rpi
+        docker run --volumes-from **$OVPN_DATA** -d -p 1194:1194/udp --privileged -e DEBUG=1 evolvedm/openvpn-rpi
         
-* Optionally add to systemd (remove --restart=always from step 3)
-[Unit]
-Description=OpenVPN Container
-Requires=docker.service
-After=docker.service
-
-[Service]
-Restart=always
-ExecStart=/usr/bin/docker run --volumes-from ovpn-data --cap-add=NET_ADMIN -p 1194:1194/udp --net=host --env OVPN_NATDEVICE=`$OVPN_NATDEVICE` --name openvpn_server evolvedm/openvpn-rpi
-ExecStop=/usr/bin/docker stop -t 2 openvpn_server ; /usr/bin/docker rm -f openvpn_server
 
 ## How Does It Work?
 
