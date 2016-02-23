@@ -3,27 +3,25 @@ services:
  ovpn-data:
    image: hypriot/armhf-busybox
    volumes:
-    - .:/etc/openvpn
+    - /etc/openvpn
    container_name: ovpn-data
 
  genconfig:
    image: evolvedm/openvpn-rpi
    volumes_from:
-    - container:ovpn-data
+    - ovpn-data
    command: ovpn_genconfig -u udp://${OVPN_HOSTNAME}
 
  initpki:
    image: evolvedm/openvpn-rpi
    volumes_from:
-    - container:ovpn-data
+    - ovpn-data
    command: ovpn_initpki
 
  openvpn-server:
    image: evolvedm/openvpn-rpi
    volumes_from:
-    - container:ovpn-data
-   ports:
-    - "1194:1194/udp"
+    - ovpn-data
    cap_add:
     - NET_ADMIN
    restart: "always"
@@ -35,4 +33,4 @@ services:
  genclient:
    image: evolvedm/openvpn-rpi
    volumes_from:
-    - container:ovpn-data
+    - ovpn-data
