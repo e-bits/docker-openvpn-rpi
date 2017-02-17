@@ -19,7 +19,6 @@ services:
   openvpn-server:
     image: evolvedm/openvpn-rpi
     container_name: openvpn-server
-    command: ovpn_initpki
     volumes:
       - ovpn-data:/etc/openvpn
     network_mode: "host"
