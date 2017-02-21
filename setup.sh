@@ -5,6 +5,6 @@ fi
 
 export OVPN_HOSTNAME=$1
 
-docker-compose up genconfig
-docker-compose up initpki
+docker-compose run --rm genconfig
+docker-compose run --rm initpki
 docker-compose up -d openvpn-server

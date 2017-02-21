@@ -6,7 +6,7 @@ volumes:
 services:
   genconfig:
     image: evolvedm/openvpn-rpi
-    command: ovpn_genconfig -u udp://${OVPN_HOSTNAME}
+    command: ovpn_genconfig -u tcp://${OVPN_HOSTNAME}
     volumes:
       - ovpn-data:/etc/openvpn
 
@@ -21,9 +21,8 @@ services:
     container_name: openvpn-server
     volumes:
       - ovpn-data:/etc/openvpn
-    network_mode: "host"
     ports:
-      - 1194:1194/udp
+      - 443:1194/tcp
     cap_add:
       - NET_ADMIN
     restart: "always"
